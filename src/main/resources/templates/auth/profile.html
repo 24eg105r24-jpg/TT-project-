@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Anurag University Announcements</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper" style="max-width: 800px;">
+    <div style="margin-bottom: 2rem;">
+        <h1>My Account Profile</h1>
+        <p style="color: var(--text-secondary);">Your registered college identity and notification targeting parameters</p>
+    </div>
+
+    <div class="card" style="box-shadow: var(--shadow-md);">
+        <div class="card-header" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.08), transparent);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="user-avatar-circle" style="width: 54px; height: 54px; font-size: 1.5rem;" th:text="${#strings.substring(currentUser.fullName, 0, 1)}">U</div>
+                <div>
+                    <h2 style="font-size: 1.35rem;" th:text="${currentUser.fullName}">Full Name</h2>
+                    <span class="badge badge-academic" th:text="${currentUser.role.displayName}">Student</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+                <div>
+                    <label class="form-label" style="color: var(--text-muted); font-size: 0.78rem;">COLLEGE EMAIL</label>
+                    <p style="font-weight: 600; font-family: 'JetBrains Mono', monospace;" th:text="${currentUser.email}">email@anurag.edu.in</p>
+                </div>
+
+                <div>
+                    <label class="form-label" style="color: var(--text-muted); font-size: 0.78rem;">ROLL / EMPLOYEE NUMBER</label>
+                    <p style="font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent);" th:text="${currentUser.rollNumber}">24EG105R24</p>
+                </div>
+
+                <div>
+                    <label class="form-label" style="color: var(--text-muted); font-size: 0.78rem;">DEPARTMENT</label>
+                    <p style="font-weight: 600;" th:text="${currentUser.department != null ? currentUser.department.name + ' (' + currentUser.department.code + ')' : 'Campus-wide / Admin'}">CSE</p>
+                </div>
+
+                <div th:if="${currentUser.academicYear != null}">
+                    <label class="form-label" style="color: var(--text-muted); font-size: 0.78rem;">ACADEMIC YEAR &amp; SECTION</label>
+                    <p style="font-weight: 600;" th:text="${'Year ' + currentUser.academicYear + ' - Section ' + (currentUser.section != null ? currentUser.section : 'A')}">Year 2 - Sec A</p>
+                </div>
+
+                <div>
+                    <label class="form-label" style="color: var(--text-muted); font-size: 0.78rem;">PHONE CONTACT</label>
+                    <p style="font-weight: 600;" th:text="${currentUser.phone != null ? currentUser.phone : 'Not provided'}">+91 63019 83933</p>
+                </div>
+
+                <div>
+                    <label class="form-label" style="color: var(--text-muted); font-size: 0.78rem;">ACCOUNT STATUS</label>
+                    <p style="font-weight: 600; color: var(--success);">✓ Active &amp; Verified</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <a th:href="@{/dashboard}" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${'Member since ' + #temporals.format(currentUser.createdAt, 'dd MMMM yyyy')}">Date</span>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

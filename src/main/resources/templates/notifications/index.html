@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Center | Anurag University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper" style="max-width: 860px;">
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Success</div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+            <h1>🔔 Notification Center</h1>
+            <p style="color: var(--text-secondary);">Direct in-app alerts dispatched whenever an announcement matches your branch or role</p>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <form th:action="@{/notifications/read-all}" method="post">
+                <button type="submit" class="btn btn-secondary btn-sm" th:disabled="${unreadCount == 0}">
+                    ✓ Mark All as Read
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <a th:href="@{/notifications(filter='all')}" class="btn btn-sm" th:classappend="${currentFilter == 'all' ? 'btn-primary' : 'btn-secondary'}">
+            All Notifications (<span th:text="${notifications.size()}">0</span>)
+        </a>
+        <a th:href="@{/notifications(filter='unread')}" class="btn btn-sm" th:classappend="${currentFilter == 'unread' ? 'btn-primary' : 'btn-secondary'}">
+            Unread Only (<span th:text="${unreadCount}">0</span>)
+        </a>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${notifications.isEmpty()}" class="card" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✨</div>
+        <h3>You are completely caught up!</h3>
+        <p>No notifications waiting for your review.</p>
+    </div>
+
+    <!-- Notification List -->
+    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div th:each="n : ${notifications}" class="card" style="transition: var(--transition);" th:styleappend="${!n.isRead ? 'border-left: 4px solid var(--primary-light); background: rgba(59, 130, 246, 0.02);' : ''}">
+            <div class="card-body" style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                        <span th:if="${!n.isRead}" class="badge" style="background: var(--danger-bg); color: var(--danger); font-size: 0.68rem;">NEW</span>
+                        <strong style="font-size: 1rem; color: var(--text-primary);" th:text="${n.title}">Notification Title</strong>
+                    </div>
+
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.45;" th:text="${n.message}">
+                        Notification body text...
+                    </p>
+
+                    <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 1rem; align-items: center;">
+                        <span>📅 <time th:text="${#temporals.format(n.createdAt, 'dd MMM yyyy, hh:mm a')}">Timestamp</time></span>
+                        <span>Channel: <strong>In-App &amp; Email</strong></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+                    <a th:href="@{'/announcements/' + ${n.announcement.id}}" class="btn btn-sm btn-primary">
+                        View Notice &rarr;
+                    </a>
+
+                    <form th:if="${!n.isRead}" th:action="@{'/notifications/' + ${n.id} + '/read'}" method="post">
+                        <button type="submit" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+                            Mark as Read
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

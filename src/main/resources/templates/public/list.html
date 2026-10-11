@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Official Public Notices | Anurag University</title>
+    <meta name="description" th:content="${metaDescription}">
+    <meta property="og:title" th:content="${pageTitle}">
+    <meta property="og:description" th:content="${metaDescription}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://announcements.anurag.edu.in/public/announcements">
+    <link rel="canonical" href="https://announcements.anurag.edu.in/public/announcements">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper" style="max-width: 1040px;">
+    <!-- Public Header -->
+    <header style="margin-bottom: 2.5rem; text-align: center; background: linear-gradient(135deg, rgba(30, 58, 138, 0.05), rgba(249, 115, 22, 0.05)); padding: 2.5rem 1.5rem; border-radius: var(--radius-xl); border: 1px solid var(--border-color);">
+        <div class="badge badge-academic" style="margin-bottom: 0.75rem;">🌐 Verified University Circulars</div>
+        <h1 style="font-size: 2.35rem; margin-bottom: 0.5rem;">Official Public Notices &amp; Bulletins</h1>
+        <p style="color: var(--text-secondary); max-width: 680px; margin: 0 auto; line-height: 1.6;">
+            Open circulars for students, parents, recruitment partners and campus visitors from Anurag University, Hyderabad.
+        </p>
+    </header>
+
+    <!-- Public Notices Grid -->
+    <section class="announcements-grid">
+        <article th:each="n : ${notices}" class="announcement-card">
+            <div>
+                <div class="card-top-meta">
+                    <span class="badge" th:classappend="${n.category.cssClass}" th:text="${n.category.icon + ' ' + n.category.label}">Event</span>
+                    <span th:classappend="${n.priority.cssClass}" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;" th:text="${n.priority.label}">Priority</span>
+                </div>
+
+                <h2 class="announcement-title">
+                    <a th:href="@{'/public/announcements/' + ${n.id}}" th:text="${n.title}">Notice Title</a>
+                </h2>
+
+                <p class="announcement-excerpt" th:text="${n.content}">Notice summary content...</p>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span th:if="${n.attachments != null && !n.attachments.isEmpty()}" style="font-size: 0.78rem; color: var(--primary-light); font-weight: 600;">
+                        📎 <span th:text="${n.attachments.size() + ' Attachment(s)'}">1 File</span>
+                    </span>
+                    <span th:if="${n.attachments == null || n.attachments.isEmpty()}" style="font-size: 0.78rem; color: var(--text-muted);">
+                        Public Circular
+                    </span>
+
+                    <a th:href="@{'/public/announcements/' + ${n.id}}" class="btn btn-sm btn-primary">
+                        Read Full Circular &rarr;
+                    </a>
+                </div>
+
+                <div class="card-author-footer">
+                    <div class="author-info">
+                        <span>✍️ <strong th:text="${n.author.fullName}">Author</strong></span>
+                    </div>
+                    <time th:text="${#temporals.format(n.publishedAt, 'dd MMM yyyy')}">Date</time>
+                </div>
+            </div>
+        </article>
+    </section>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

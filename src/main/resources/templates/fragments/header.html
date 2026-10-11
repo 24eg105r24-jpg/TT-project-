@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<header th:fragment="header" class="navbar">
+    <div class="navbar-inner">
+        <!-- Brand / College Header -->
+        <a th:href="@{/}" class="brand-wrapper">
+            <div class="brand-logo-icon">📢</div>
+            <div class="brand-text">
+                <h1>ANURAG UNIVERSITY</h1>
+                <span>Smart Notice &amp; Notification Portal</span>
+            </div>
+        </a>
+
+        <!-- Main Navigation Links -->
+        <ul class="nav-links">
+            <li sec:authorize="isAuthenticated()">
+                <a th:href="@{/dashboard}" class="nav-link" th:classappend="${#httpServletRequest != null && #httpServletRequest.requestURI == '/dashboard' ? 'active' : ''}">
+                    📊 Dashboard
+                </a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <a th:href="@{/announcements}" class="nav-link" th:classappend="${#httpServletRequest != null && #strings.startsWith(#httpServletRequest.requestURI, '/announcements') ? 'active' : ''}">
+                    📋 Announcements
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/public/announcements}" class="nav-link">
+                    🌐 Public Circulars
+                </a>
+            </li>
+            <li sec:authorize="hasAnyRole('FACULTY', 'ADMIN')">
+                <a th:href="@{/announcements/create}" class="nav-link">
+                    ✍️ Post Notice
+                </a>
+            </li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/analytics}" class="nav-link">
+                    📈 Reach Analytics
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/about}" class="nav-link">
+                    ℹ️ Project Abstract
+                </a>
+            </li>
+        </ul>
+
+        <!-- Action Items (Notification, Theme, User) -->
+        <div class="nav-actions">
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle-btn" class="notification-bell-btn" title="Toggle Theme">
+                🌙
+            </button>
+
+            <!-- Notification Bell (Authenticated Users) -->
+            <div sec:authorize="isAuthenticated()" style="position: relative;">
+                <button id="notification-bell-btn" class="notification-bell-btn" title="Notifications">
+                    🔔
+                    <span th:if="${unreadCount != null && unreadCount > 0}" class="badge-count" th:text="${unreadCount}">0</span>
+                </button>
+
+                <!-- Dropdown Flyout -->
+                <div id="notification-dropdown" class="card" style="display: none; position: absolute; right: 0; top: 48px; width: 340px; z-index: 100; box-shadow: var(--shadow-xl);">
+                    <div class="card-header" style="padding: 0.85rem 1rem;">
+                        <h4 style="font-size: 0.95rem;">Notifications</h4>
+                        <a th:href="@{/notifications}" class="btn btn-sm btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">View All</a>
+                    </div>
+                    <div style="max-height: 280px; overflow-y: auto;">
+                        <div th:if="${recentNotifications == null || recentNotifications.isEmpty()}" style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                            No recent notifications
+                        </div>
+                        <div th:each="n : ${recentNotifications}" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.82rem;" th:styleappend="${!n.isRead ? 'background: rgba(59, 130, 246, 0.05);' : ''}">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+                                <strong th:text="${n.title}" style="color: var(--text-primary); font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">Notice Title</strong>
+                                <span style="font-size: 0.7rem; color: var(--text-muted);" th:text="${#temporals.format(n.createdAt, 'HH:mm')}">Time</span>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.3;" th:text="${n.message}">Message</p>
+                            <a th:href="@{'/announcements/' + ${n.announcement.id}}" class="btn btn-sm btn-primary" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">Open</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Menu (Authenticated) -->
+            <div sec:authorize="isAuthenticated()" style="display: flex; align-items: center; gap: 0.5rem;">
+                <a th:href="@{/profile}" class="user-pill" title="View Profile">
+                    <div class="user-avatar-circle" th:text="${#strings.substring(currentUser != null ? currentUser.fullName : 'U', 0, 1)}">U</div>
+                    <div class="user-pill-info">
+                        <span class="user-pill-name" th:text="${currentUser != null ? currentUser.fullName : 'User'}">User</span>
+                        <span class="user-pill-role" th:text="${currentUser != null ? currentUser.role.displayName : 'Role'}">Student</span>
+                    </div>
+                </a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-secondary" title="Logout" style="padding: 0.45rem 0.65rem;">
+                        🚪 Logout
+                    </button>
+                </form>
+            </div>
+
+            <!-- Login / Register Buttons (Guest) -->
+            <div sec:authorize="isAnonymous()" style="display: flex; align-items: center; gap: 0.5rem;">
+                <a th:href="@{/login}" class="btn btn-sm btn-outline">Portal Login</a>
+                <a th:href="@{/register}" class="btn btn-sm btn-accent">Student Register</a>
+            </div>
+        </div>
+    </div>
+</header>
+</body>
+</html>

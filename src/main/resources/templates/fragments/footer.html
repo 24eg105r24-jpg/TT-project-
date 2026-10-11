@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<footer th:fragment="footer" class="footer">
+    <div class="footer-inner">
+        <!-- Student Project Credit Box -->
+        <div class="student-credit-box">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+                <div>
+                    <strong style="color: var(--primary-light); font-size: 0.95rem;">📢 Smart College Announcement &amp; Notification Management System</strong>
+                    <p style="margin-top: 0.25rem; color: var(--text-secondary);">
+                        Academic Project Submission • <strong>Anurag University, Hyderabad</strong>
+                    </p>
+                </div>
+                <div style="font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary);">
+                    <div><strong>Submitted By:</strong> Narayanadas Wisshwakh Shen</div>
+                    <div><strong>Roll Number:</strong> <span style="font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 600;">24EG105R24</span></div>
+                    <div><strong>College Email:</strong> 24eg105r24@anurag.edu.in | <strong>Phone:</strong> +91 63019 83933</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>
+                &copy; 2026 Anurag University. All Rights Reserved. Built with Spring Boot 3, Thymeleaf, MySQL &amp; Vanilla CSS.
+            </div>
+            <div style="display: flex; gap: 1.25rem;">
+                <a th:href="@{/about}">System Architecture</a>
+                <a th:href="@{/public/announcements}">Public Notices</a>
+                <a th:href="@{/sitemap.xml}" target="_blank">Sitemap.xml</a>
+                <a th:href="@{/robots.txt}" target="_blank">Robots.txt</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

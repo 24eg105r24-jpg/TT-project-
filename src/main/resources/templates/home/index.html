@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart College Announcement &amp; Notification Portal | Anurag University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper">
+    <!-- Hero Section -->
+    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.08), rgba(249, 115, 22, 0.08)); border-radius: var(--radius-xl); padding: 3.5rem 2.5rem; text-align: center; margin-bottom: 2.5rem; border: 1px solid var(--border-color);">
+        <div class="badge badge-academic" style="margin-bottom: 1rem; font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+            🏛️ Anurag University Official Communication Hub
+        </div>
+        <h1 style="font-size: 2.75rem; letter-spacing: -0.03em; margin-bottom: 1rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+            One Portal for Every College Announcement — Built for Students, Faculty &amp; Admins
+        </h1>
+        <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 720px; margin: 0 auto 2rem; line-height: 1.6;">
+            Replacing fragmented WhatsApp chats and physical notice boards with role-targeted, real-time in-app delivery, automated notifications, and measurable read &amp; acknowledgement tracking.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a th:href="@{/login}" class="btn btn-primary btn-lg">
+                🔐 Access Portal Login
+            </a>
+            <a th:href="@{/public/announcements}" class="btn btn-secondary btn-lg">
+                📢 View Public Circulars
+            </a>
+            <a th:href="@{/about}" class="btn btn-outline btn-lg">
+                📖 Project Documentation
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">📋</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${totalAnnouncements}">12</div>
+                <div class="stat-label">Published Circulars</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon accent">👥</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${totalUsers}">8</div>
+                <div class="stat-label">Active Campus Accounts</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success">🏛️</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${totalDepartments}">10</div>
+                <div class="stat-label">University Departments</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon warning">⚡</div>
+            <div class="stat-info">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Automated Delivery</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1-Click Role Login Cards (Demonstration Showcase) -->
+    <div style="margin-bottom: 3rem;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <h2>Quick Persona Demo Access</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Experience how the system looks and behaves for each role</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <!-- Student Persona -->
+            <div class="card" style="border-top: 4px solid var(--primary-light);">
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 2rem;">🎓</span>
+                        <div>
+                            <h3 style="font-size: 1.15rem;">Student Experience</h3>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">ROLE_STUDENT</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        View branch-specific circulars, urgent alert ribbons, track unread notices, and click to acknowledge circulars.
+                    </p>
+                    <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;">
+                        Email: <strong>24eg105r24@anurag.edu.in</strong><br>
+                        Pass: <strong>student123</strong>
+                    </div>
+                    <a th:href="@{/login}" class="btn btn-sm btn-primary" style="width: 100%;">
+                        Login as Student (Narayanadas W.)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Faculty Persona -->
+            <div class="card" style="border-top: 4px solid var(--accent);">
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 2rem;">👨‍🏫</span>
+                        <div>
+                            <h3 style="font-size: 1.15rem;">Faculty Experience</h3>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">ROLE_FACULTY</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Compose and target announcements to specific branches, years, or sections. Attach circular files and monitor reach.
+                    </p>
+                    <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;">
+                        Email: <strong>wisshwa.faculty@anurag.edu.in</strong><br>
+                        Pass: <strong>faculty123</strong>
+                    </div>
+                    <a th:href="@{/login}" class="btn btn-sm btn-accent" style="width: 100%;">
+                        Login as Faculty (Prof. Wisshwa)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Admin Persona -->
+            <div class="card" style="border-top: 4px solid #10b981;">
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 2rem;">🛡️</span>
+                        <div>
+                            <h3 style="font-size: 1.15rem;">Admin Analytics</h3>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">ROLE_ADMIN</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Real-time reach metrics, delivery logs, read-rates %, department breakdown, and CSV export for compliance audit.
+                    </p>
+                    <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;">
+                        Email: <strong>admin@anurag.edu.in</strong><br>
+                        Pass: <strong>admin123</strong>
+                    </div>
+                    <a th:href="@{/login}" class="btn btn-sm btn-success" style="width: 100%;">
+                        Login as Administrator (Dean)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Public Notices Preview -->
+    <div style="margin-top: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2>Recent Public Notices</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">General circulars open for students, faculty &amp; public review</p>
+            </div>
+            <a th:href="@{/public/announcements}" class="btn btn-outline btn-sm">Browse All &rarr;</a>
+        </div>
+
+        <div class="announcements-grid">
+            <div th:each="a : ${publicAnnouncements}" class="announcement-card">
+                <div>
+                    <div class="card-top-meta">
+                        <span class="badge" th:classappend="${a.category.cssClass}" th:text="${a.category.icon + ' ' + a.category.label}">Academic</span>
+                        <span th:classappend="${a.priority.cssClass}" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;" th:text="${a.priority.label}">High</span>
+                    </div>
+
+                    <h3 class="announcement-title">
+                        <a th:href="@{'/public/announcements/' + ${a.id}}" th:text="${a.title}">Title</a>
+                    </h3>
+
+                    <p class="announcement-excerpt" th:text="${a.content}">Excerpt</p>
+                </div>
+
+                <div>
+                    <div class="card-author-footer">
+                        <div class="author-info">
+                            <span>✍️ <strong th:text="${a.author.fullName}">Author</strong></span>
+                        </div>
+                        <time th:text="${#temporals.format(a.publishedAt, 'dd MMM yyyy')}">Date</time>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

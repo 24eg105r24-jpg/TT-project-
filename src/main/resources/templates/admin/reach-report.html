@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcement Reach Audit Report | Anurag University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <a th:href="@{/admin/analytics}" class="btn btn-secondary btn-sm">&larr; Back to Analytics</a>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <button onclick="exportTableToCSV('reach-audit-table', 'reach-report.csv')" class="btn btn-accent btn-sm">
+                📥 Export CSV
+            </button>
+            <button onclick="window.print()" class="btn btn-outline btn-sm">
+                🖨️ Print Audit
+            </button>
+        </div>
+    </div>
+
+    <!-- Announcement Context Banner -->
+    <div class="card" style="margin-bottom: 2rem; border-left: 6px solid var(--primary);">
+        <div class="card-body" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="badge" th:classappend="${announcement.category.cssClass}" th:text="${announcement.category.icon + ' ' + announcement.category.label}">Academic</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${#temporals.format(announcement.publishedAt, 'dd MMMM yyyy, hh:mm a')}">Date</span>
+            </div>
+
+            <h1 style="font-size: 1.65rem; margin-bottom: 0.5rem;" th:text="${announcement.title}">
+                Announcement Title
+            </h1>
+
+            <div style="font-size: 0.88rem; color: var(--text-secondary); display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                <span>Author: <strong><span th:text="${announcement.author.fullName}">Author</span></strong></span>
+                <span>Target: <strong><span th:text="${announcement.targets != null && !announcement.targets.isEmpty() ? announcement.targets[0].computeReadableScope() : 'All College'}">Scope</span></strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reach KPI Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">🎯</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${report.totalTargeted}">10</div>
+                <div class="stat-label">Targeted Accounts</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon accent">📨</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${report.totalDelivered}">10</div>
+                <div class="stat-label">Delivered In-App/Email</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">👀</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${report.readCount + ' (' + report.readRatePercentage + '%)'}">8 (80%)</div>
+                <div class="stat-label">Notice Read Rate</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">✍️</div>
+            <div class="stat-info">
+                <div class="stat-value" style="color: var(--success);" th:text="${report.acknowledgedCount + ' (' + report.ackRatePercentage + '%)'}">6 (60%)</div>
+                <div class="stat-label">Acknowledged Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipient-Level Readership & Acknowledgement Audit Table -->
+    <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3>Recipient-Wise Delivery &amp; Acknowledgement Trail</h3>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.2rem;">Complete append-only audit verification for college administrative records</p>
+            </div>
+            <span class="badge" style="background: var(--bg-surface); color: var(--text-secondary);" th:text="${report.recipientStatuses.size() + ' Total Recipients'}">10 Recipients</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="reach-audit-table">
+                <thead>
+                    <tr>
+                        <th>Recipient Details</th>
+                        <th>Role / Dept</th>
+                        <th>Year &amp; Section</th>
+                        <th>Read Status</th>
+                        <th>Read Timestamp</th>
+                        <th>Acknowledgement</th>
+                        <th>Student Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${report.recipientStatuses}">
+                        <td>
+                            <strong th:text="${r.fullName}">Student Name</strong>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;" th:text="${r.rollNumber != null ? r.rollNumber : r.email}">
+                                24EG105R24
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-academic" th:text="${r.roleName}">Student</span>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;" th:text="${r.departmentName}">CSE</div>
+                        </td>
+                        <td>
+                            <span th:if="${r.academicYear != null}" th:text="${'Year ' + r.academicYear + (r.section != null ? ' - Sec ' + r.section : '')}">Year 2 - Sec A</span>
+                            <span th:if="${r.academicYear == null}" style="color: var(--text-muted);">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${r.read}" style="color: var(--success); font-weight: 700;">✓ Read</span>
+                            <span th:if="${!r.read}" style="color: var(--danger); font-weight: 600;">✗ Unread</span>
+                        </td>
+                        <td style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace;">
+                            <span th:if="${r.readAt != null}" th:text="${#temporals.format(r.readAt, 'dd MMM, HH:mm')}">Timestamp</span>
+                            <span th:if="${r.readAt == null}" style="color: var(--text-muted);">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${r.acknowledged}" class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
+                                ✓ Acknowledged
+                            </span>
+                            <span th:if="${!r.acknowledged}" class="badge" style="background: var(--warning-bg); color: var(--warning); border: 1px solid #fde68a;">
+                                ⏳ Pending
+                            </span>
+                        </td>
+                        <td style="font-size: 0.82rem; color: var(--text-secondary); max-width: 200px;">
+                            <span th:if="${r.remarks != null}" th:text="${r.remarks}">Remarks</span>
+                            <span th:if="${r.remarks == null}" style="color: var(--text-muted);">-</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

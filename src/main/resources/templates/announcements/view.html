@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${announcement.title + ' | Anurag University'}">Notice Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper" style="max-width: 940px;">
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Success</div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error</div>
+
+    <!-- Back and Action Buttons Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+        <a th:href="@{/announcements}" class="btn btn-secondary btn-sm">&larr; Back to Notice Board</a>
+
+        <div th:if="${isAuthorOrAdmin}" style="display: flex; gap: 0.5rem;">
+            <a th:href="@{'/admin/announcements/' + ${announcement.id} + '/reach'}" class="btn btn-accent btn-sm">
+                📊 View Reach &amp; Audit Trail
+            </a>
+            <a th:href="@{'/announcements/' + ${announcement.id} + '/edit'}" class="btn btn-outline btn-sm">
+                ✏️ Edit Notice
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Notice Card -->
+    <article class="card" style="box-shadow: var(--shadow-lg); margin-bottom: 2rem;">
+        <!-- Header Ribbon & Metadata -->
+        <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 2rem 2rem 1.5rem; background: linear-gradient(135deg, rgba(30, 58, 138, 0.05), transparent);">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span class="badge" th:classappend="${announcement.category.cssClass}" th:text="${announcement.category.icon + ' ' + announcement.category.label}">Academic</span>
+                    <span class="badge" th:classappend="${announcement.priority.cssClass}" style="background: var(--bg-surface); border: 1px solid var(--border-color);" th:text="${announcement.priority.label + ' Priority'}">Urgent</span>
+                    <span th:if="${announcement.isPublic}" class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">🌐 Public Circular</span>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    👁️ <span th:text="${announcement.viewCount}">12</span> reads
+                </div>
+            </div>
+
+            <h1 style="font-size: 1.85rem; line-height: 1.3; color: var(--text-primary); margin-top: 0.25rem;" th:text="${announcement.title}">
+                Announcement Title
+            </h1>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary);">
+                <div>
+                    <span>Published by <strong><span th:text="${announcement.author.fullName}">Author Name</span></strong> (<span th:text="${announcement.author.department != null ? announcement.author.department.code : 'Dean'}">CSE</span>)</span>
+                </div>
+                <div>
+                    <span>📅 <time th:text="${#temporals.format(announcement.publishedAt, 'dd MMMM yyyy, hh:mm a')}">11 Oct 2026, 10:30 AM</time></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body Content -->
+        <div class="card-body" style="padding: 2rem; font-size: 1.05rem; line-height: 1.75; color: var(--text-primary); white-space: pre-line;">
+            <p th:text="${announcement.content}">Detailed circular body text...</p>
+        </div>
+
+        <!-- Target Scope Pill Info -->
+        <div style="padding: 1rem 2rem; background: var(--bg-surface); border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary);">
+            <strong>🎯 Target Audience:</strong>
+            <span th:text="${announcement.targets != null && !announcement.targets.isEmpty() ? announcement.targets[0].computeReadableScope() : 'Campus-wide'}">Whole College</span>
+            <span th:if="${announcement.expiresAt != null}" style="margin-left: 1.5rem;">
+                ⏳ <strong>Valid Until:</strong> <span th:text="${#temporals.format(announcement.expiresAt, 'dd MMM yyyy')}">Date</span>
+            </span>
+        </div>
+
+        <!-- Attachments Section (If any) -->
+        <div th:if="${announcement.attachments != null && !announcement.attachments.isEmpty()}" style="padding: 1.5rem 2rem; border-top: 1px solid var(--border-color);">
+            <h4 style="font-size: 0.95rem; margin-bottom: 0.85rem;">📎 Official Attachments &amp; Circular Downloads</h4>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                <div th:each="att : ${announcement.attachments}" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                        <span style="font-size: 1.4rem;">📄</span>
+                        <div>
+                            <strong style="font-size: 0.9rem;" th:text="${att.originalFileName}">Circular.pdf</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); display: block;" th:text="${att.getFormattedSize()}">2.4 MB</span>
+                        </div>
+                    </div>
+                    <a th:href="@{'/attachments/' + ${att.id}}" class="btn btn-sm btn-primary">
+                        ⬇️ Download File
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acknowledgement Tracking Action Box -->
+        <div class="card-footer" style="padding: 1.75rem 2rem; background: var(--bg-card); border-top: 2px solid var(--border-color);">
+            <div th:if="${hasAcknowledged}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: gap; background: var(--success-bg); border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1rem 1.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">✅</span>
+                    <div>
+                        <strong style="color: #065f46; font-size: 0.95rem;">You have noted &amp; acknowledged this notice</strong>
+                        <p style="color: #047857; font-size: 0.8rem; margin: 0;" th:text="${'Acknowledged on ' + #temporals.format(userAck.acknowledgedAt, 'dd MMM yyyy, hh:mm a') + ' — \"' + userAck.remarks + '\"'}">Timestamp</p>
+                    </div>
+                </div>
+                <span class="badge" style="background: #10b981; color: #ffffff;">Recorded</span>
+            </div>
+
+            <div th:if="${!hasAcknowledged}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: var(--warning-bg); border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 1.25rem 1.5rem;">
+                <div>
+                    <strong style="color: #92400e; font-size: 1rem;">Action Required: Acknowledge this Notice</strong>
+                    <p style="color: #b45309; font-size: 0.85rem; margin: 0.25rem 0 0;">
+                        Please confirm you have read and understood this circular to update the administration's readership audit trail.
+                    </p>
+                </div>
+                <button type="button" id="open-ack-modal-btn" class="btn btn-accent btn-lg" style="box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);">
+                    ✍️ Acknowledge / Mark as Noted
+                </button>
+            </div>
+        </div>
+    </article>
+
+    <!-- Acknowledgement Modal Form -->
+    <div id="ack-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="card-header">
+                <h3>Confirm Notice Acknowledgement</h3>
+                <button type="button" id="close-ack-modal-btn" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <form th:action="@{'/announcements/' + ${announcement.id} + '/acknowledge'}" method="post">
+                <div class="card-body">
+                    <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        By confirming, you record an official receipt that you have reviewed:
+                        <strong style="display: block; margin-top: 0.25rem; color: var(--text-primary);" th:text="${announcement.title}">Title</strong>
+                    </p>
+
+                    <div class="form-group">
+                        <label for="remarks" class="form-label">Optional Comments / Remarks</label>
+                        <input type="text" id="remarks" name="remarks" class="form-control" placeholder="e.g. Noted schedule changes / Received guidelines">
+                    </div>
+                </div>
+                <div class="card-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button type="button" id="cancel-ack-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-accent">Confirm &amp; Acknowledge</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

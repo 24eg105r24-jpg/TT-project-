@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Abstract, Architecture &amp; ER Design | Smart College Announcements</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper" style="max-width: 1040px;">
+    <!-- Project Header Banner -->
+    <div style="background: linear-gradient(135deg, var(--primary), #1e293b); color: #ffffff; border-radius: var(--radius-xl); padding: 2.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-lg);">
+        <div class="badge" style="background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); margin-bottom: 0.75rem;">
+            Academic Capstone Documentation
+        </div>
+        <h1 style="color: #ffffff; font-size: 2.2rem; margin-bottom: 0.75rem;">
+            Smart College Announcement &amp; Notification Management System
+        </h1>
+        <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.5;">
+            One Portal for Every College Announcement — Built for Students, Faculty &amp; Admins.<br>
+            Engineered with <strong>Spring Boot 3 (Web · Security · Data JPA · MySQL)</strong> + <strong>Thymeleaf &amp; Vanilla CSS/JS</strong>.
+        </p>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.15); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.88rem;">
+            <div>
+                <span style="color: #94a3b8; display: block; font-size: 0.75rem; text-transform: uppercase;">Submitted By</span>
+                <strong>Narayanadas Wisshwakh Shen</strong>
+            </div>
+            <div>
+                <span style="color: #94a3b8; display: block; font-size: 0.75rem; text-transform: uppercase;">Roll Number</span>
+                <strong style="color: #fdba74; font-family: 'JetBrains Mono', monospace;">24EG105R24</strong>
+            </div>
+            <div>
+                <span style="color: #94a3b8; display: block; font-size: 0.75rem; text-transform: uppercase;">Institution</span>
+                <strong>Anurag University</strong>
+            </div>
+            <div>
+                <span style="color: #94a3b8; display: block; font-size: 0.75rem; text-transform: uppercase;">Contact</span>
+                <span>+91 63019 83933</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 1: Abstract -->
+    <section class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <h3>1. Project Abstract</h3>
+        </div>
+        <div class="card-body" style="font-size: 0.98rem; line-height: 1.7; color: var(--text-secondary);">
+            <p style="margin-bottom: 1rem;">
+                Every college runs on announcements, yet most colleges still spread them across WhatsApp groups, printed notices, class representatives, and scattered emails. Something urgent — a postponed exam, a placement drive, a fee deadline — can quietly get lost between five different channels, and no one at the top ever really knows who has actually seen it.
+            </p>
+            <p style="margin-bottom: 1rem;">
+                The <strong>Smart College Announcement and Notification Management System</strong> fixes this by giving the entire college one place to publish, target, and track every announcement, from the smallest circular to a campus-wide alert.
+            </p>
+            <p>
+                Faculty and admins compose an announcement once, choose exactly who it is for — a single class, a department, a graduating batch, or everyone — and the system instantly delivers it as an in-app notice and email log. Students and faculty open a single, always-current dashboard with built-in search, category filters, and a simple read/acknowledge trail that finally gives admins a real picture of who has seen what.
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 2: Architecture & Layers -->
+    <section class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <h3>2. High-Level System Architecture</h3>
+        </div>
+        <div class="card-body">
+            <!-- Architecture Flow Box -->
+            <div style="background: var(--bg-surface); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                    <div style="background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--primary-light);">
+                        [Client Devices] Desktop Browsers · Tablets · Android/iOS Mobile Devices (Vanilla HTML5 + Responsive CSS)
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted);">▼ HTTP/HTTPS Requests (Cookies, CSRF Token)</div>
+                    <div style="background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border-left: 4px solid #10b981;">
+                        [Security Filter Chain] Spring Security 6 (BCrypt Password Hashing · Role Authorization: STUDENT / FACULTY / ADMIN)
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted);">▼ Authorized Session</div>
+                    <div style="background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--accent);">
+                        [Controller Layer] AuthController · DashboardController · AnnouncementController · NotificationController · AdminController
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted);">▼ Business Validation &amp; DTO Mapping</div>
+                    <div style="background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border-left: 4px solid #8b5cf6;">
+                        [Service Layer] AnnouncementService · NotificationService (Targeting Matcher) · AcknowledgementService · AnalyticsService
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted);">▼ Spring Data JPA / Hibernate Transactions</div>
+                    <div style="background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border-left: 4px solid #f59e0b;">
+                        [Persistence Layer] MySQL 8.x Database (`smart_college_announcements_db`) &amp; File Storage (`uploads/`)
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                <div style="padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md);">
+                    <strong>Controller Layer:</strong> Validates incoming requests and delegates commands cleanly.
+                </div>
+                <div style="padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md);">
+                    <strong>Service Layer:</strong> Encapsulates notification dispatching, targeting filters, and reach calculation.
+                </div>
+                <div style="padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md);">
+                    <strong>Repository Layer:</strong> Spring Data JPA entities turning calls into optimized SQL.
+                </div>
+                <div style="padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md);">
+                    <strong>Thymeleaf View:</strong> Server-rendered HTML with zero JavaScript bundle overhead.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Entity-Relationship Model -->
+    <section class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <h3>3. Entity–Relationship (ER) Design</h3>
+        </div>
+        <div class="card-body">
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                The data model cleanly separates identity (<code>USER</code>, <code>ROLE</code>, <code>DEPARTMENT</code>) from content (<code>ANNOUNCEMENT</code>, <code>ATTACHMENT</code>) and delivery tracking (<code>ANNOUNCEMENT_TARGET</code>, <code>NOTIFICATION</code>, <code>ACKNOWLEDGEMENT</code>).
+            </p>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Entity</th>
+                            <th>Key Attributes</th>
+                            <th>Relationships</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>USER</strong></td>
+                            <td>id, fullName, email, password, rollNumber, role, academicYear, section</td>
+                            <td>Belongs to DEPARTMENT; Has many NOTIFICATIONS</td>
+                            <td>Students, Faculty, and Admin accounts authenticated via Spring Security.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DEPARTMENT</strong></td>
+                            <td>id, code (CSE, IT, etc.), name, description, active</td>
+                            <td>Has many USERS; Referenced by TARGETS</td>
+                            <td>University academic divisions used for identity &amp; announcement targeting.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ANNOUNCEMENT</strong></td>
+                            <td>id, title, content, category, priority, status, publishedAt, isPublic</td>
+                            <td>Authored by USER; Has many TARGETS, ATTACHMENTS, ACKS</td>
+                            <td>Core circular item published with priority ribbons and expiry dates.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ANNOUNCEMENT_TARGET</strong></td>
+                            <td>id, targetDepartment, targetYear, targetSection, targetRole</td>
+                            <td>Many-to-One ANNOUNCEMENT</td>
+                            <td>Rules defining exact audience (e.g. CSE Dept, 2nd Year, Section A).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NOTIFICATION</strong></td>
+                            <td>id, isRead, readAt, channel (IN_APP, EMAIL), createdAt</td>
+                            <td>Many-to-One USER; Many-to-One ANNOUNCEMENT</td>
+                            <td>Automated delivery record dispatched immediately on publishing.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ACKNOWLEDGEMENT</strong></td>
+                            <td>id, acknowledgedAt, remarks</td>
+                            <td>Unique Pair (USER, ANNOUNCEMENT)</td>
+                            <td>Append-only confirmation record feeding the admin reach analytics.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ATTACHMENT</strong></td>
+                            <td>id, originalFileName, storedFileName, fileType, fileSize, filePath</td>
+                            <td>Many-to-One ANNOUNCEMENT</td>
+                            <td>Uploaded circular PDF documents or timetable images.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Existing Process vs. Proposed System -->
+    <section class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <h3>4. Comparison: Existing Process vs. Proposed System</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Evaluation Aspect</th>
+                            <th>Manual / WhatsApp Notice Boards</th>
+                            <th>Proposed Smart College System</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Reaching Everyone</strong></td>
+                            <td>Manual forwarding; students miss group chats or circulars.</td>
+                            <td><strong style="color: var(--success);">Automatic, role-targeted delivery</strong> to matching accounts.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Finding an Old Notice</strong></td>
+                            <td>Tedious scrolling through hundreds of chat messages.</td>
+                            <td><strong style="color: var(--success);">Instant keyword search &amp; category filters</strong> in under 2 seconds.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proof of Readership</strong></td>
+                            <td>Zero visibility into who read an urgent notice.</td>
+                            <td><strong style="color: var(--success);">Live read rate % &amp; acknowledgement audit trail</strong> per circular.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Device Compatibility</strong></td>
+                            <td>Dependent on WhatsApp mobile app.</td>
+                            <td><strong style="color: var(--success);">Responsive Vanilla HTML/CSS</strong> working on any browser, phone or lab PC.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Archiving &amp; Security</strong></td>
+                            <td>Messages deleted or lost when members leave groups.</td>
+                            <td><strong style="color: var(--success);">Permanent, role-governed MySQL database</strong> backed by BCrypt auth.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

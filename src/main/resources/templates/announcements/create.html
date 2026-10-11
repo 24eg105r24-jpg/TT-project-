@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Announcement | Anurag University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper" style="max-width: 860px;">
+    <div style="margin-bottom: 2rem;">
+        <h1>✍️ Compose &amp; Publish Announcement</h1>
+        <p style="color: var(--text-secondary);">
+            Target recipients precisely. Matching students and faculty will receive instant in-app alerts and email notifications.
+        </p>
+    </div>
+
+    <div class="card" style="box-shadow: var(--shadow-lg); border-top: 4px solid var(--primary-light);">
+        <form th:action="@{/announcements/create}" th:object="${announcementDto}" method="post" enctype="multipart/form-data">
+            <div class="card-body" style="padding: 2.25rem;">
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title" class="form-label">Announcement Title *</label>
+                    <input type="text" id="title" th:field="*{title}" class="form-control" placeholder="e.g. Schedule for B.Tech End-Semester Practical Examinations" required>
+                    <div th:if="${#fields.hasErrors('title')}" class="alert alert-danger" style="margin-top: 0.5rem; padding: 0.5rem;" th:errors="*{title}">Error</div>
+                </div>
+
+                <!-- Category & Priority Row -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                    <div class="form-group">
+                        <label for="category" class="form-label">Category *</label>
+                        <select id="category" th:field="*{category}" class="form-select" required>
+                            <option th:each="c : ${categories}" th:value="${c.name()}" th:text="${c.icon + ' ' + c.label}">Category</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority" class="form-label">Priority Level *</label>
+                        <select id="priority" th:field="*{priority}" class="form-select" required>
+                            <option th:each="p : ${priorities}" th:value="${p.name()}" th:text="${p.label}">Medium</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="form-group">
+                    <label for="content" class="form-label">Announcement Details &amp; Instructions *</label>
+                    <textarea id="content" th:field="*{content}" class="form-control" rows="8" placeholder="Enter clear instructions, schedules, reporting timings, eligibility or deadlines..." required></textarea>
+                    <div th:if="${#fields.hasErrors('content')}" class="alert alert-danger" style="margin-top: 0.5rem; padding: 0.5rem;" th:errors="*{content}">Error</div>
+                </div>
+
+                <!-- Target Audience Section -->
+                <div style="background: var(--bg-surface); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">🎯 Audience Targeting Criteria</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Deliver automatically to matching accounts. Leave fields blank to target the entire university.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="targetDepartmentId" class="form-label">Target Department</label>
+                            <select id="targetDepartmentId" th:field="*{targetDepartmentId}" class="form-select">
+                                <option value="">-- All Departments --</option>
+                                <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.code + ' - ' + d.name}">CSE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="targetYear" class="form-label">Target Academic Year</label>
+                            <select id="targetYear" th:field="*{targetYear}" class="form-select">
+                                <option value="">-- All Years --</option>
+                                <option value="1">1st Year Only</option>
+                                <option value="2">2nd Year Only</option>
+                                <option value="3">3rd Year Only</option>
+                                <option value="4">4th Year Only</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="targetSection" class="form-label">Target Section</label>
+                            <select id="targetSection" th:field="*{targetSection}" class="form-select">
+                                <option value="">-- All Sections --</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                                <option value="C">Section C</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="targetRole" class="form-label">Target Role</label>
+                            <select id="targetRole" th:field="*{targetRole}" class="form-select">
+                                <option value="">-- All Roles (Everyone) --</option>
+                                <option value="ROLE_STUDENT">Students Only</option>
+                                <option value="ROLE_FACULTY">Faculty Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attachments & Settings Row -->
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <!-- File Upload -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="files" class="form-label">Attach Circular Documents (PDF / Images / Docs)</label>
+                        <input type="file" id="files" name="files" class="form-control" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Max 25MB total. Multiple files allowed.</small>
+                    </div>
+
+                    <!-- Expiry Date -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="expiryDate" class="form-label">Notice Validity / Expiry Date</label>
+                        <input type="date" id="expiryDate" th:field="*{expiryDate}" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Public Notice Toggle -->
+                <div class="form-check" style="background: var(--bg-surface); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <input type="checkbox" id="isPublic" th:field="*{public}">
+                    <label for="isPublic" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+                        🌐 Mark as Public Notice (Indexed for SEO, visible on open guest portal)
+                    </label>
+                </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.25rem;">
+                <a th:href="@{/announcements}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    📢 Publish Announcement &amp; Dispatch Alerts
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

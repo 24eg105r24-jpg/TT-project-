@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Anurag University Smart Announcements</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-wrapper">
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Success</div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error</div>
+
+    <!-- Pinned Urgent Alert Banner (If Any) -->
+    <div th:each="urgent : ${urgentAnnouncements}" class="urgent-banner">
+        <div class="urgent-banner-content">
+            <div class="urgent-icon">🚨</div>
+            <div>
+                <div class="urgent-title" th:text="${urgent.title}">URGENT NOTICE</div>
+                <div class="urgent-text" th:text="${#strings.abbreviate(urgent.content, 140)}">Details</div>
+            </div>
+        </div>
+        <a th:href="@{'/announcements/' + ${urgent.id}}" class="btn btn-sm btn-accent" style="white-space: nowrap; background: #ffffff; color: #991b1b; font-weight: 700;">
+            Review Urgent Notice &rarr;
+        </a>
+    </div>
+
+    <!-- Dashboard Welcome Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: 2rem; margin-bottom: 0.35rem;">
+                Welcome back, <span th:text="${currentUser.fullName}">Student</span>!
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                <span th:text="${currentUser.role.displayName}">Student</span> •
+                <span th:text="${currentUser.department != null ? currentUser.department.code + ' Dept' : 'All University'}">CSE Dept</span>
+                <span th:if="${currentUser.academicYear != null}" th:text="${' • Year ' + currentUser.academicYear + ' (Sec ' + currentUser.section + ')'}"> • Year 2 (Sec A)</span>
+                • Roll No: <strong style="font-family: 'JetBrains Mono', monospace;" th:text="${currentUser.rollNumber}">24EG105R24</strong>
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a sec:authorize="hasAnyRole('FACULTY', 'ADMIN')" th:href="@{/announcements/create}" class="btn btn-primary">
+                ✍️ Post New Announcement
+            </a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/analytics}" class="btn btn-accent">
+                📈 Reach Analytics
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Metric Summary Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">📬</div>
+            <div class="stat-info">
+                <div class="stat-value" th:text="${totalNotices}">10</div>
+                <div class="stat-label">Targeted Notices</div>
+            </div>
+        </div>
+
+        <a th:href="@{/notifications}" class="stat-card" style="text-decoration: none;">
+            <div class="stat-icon accent">🔔</div>
+            <div class="stat-info">
+                <div class="stat-value" style="color: var(--accent);" th:text="${unreadCount}">2</div>
+                <div class="stat-label">Unread Alerts</div>
+            </div>
+        </a>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">✍️</div>
+            <div class="stat-info">
+                <div class="stat-value" style="color: var(--warning);" th:text="${pendingAckCount}">1</div>
+                <div class="stat-label">Acks Pending</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">🛡️</div>
+            <div class="stat-info">
+                <div class="stat-value" style="color: var(--success);">Active</div>
+                <div class="stat-label">Real-Time Sync</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Category Filters -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-body" style="padding: 1.25rem;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <!-- Live Search Box -->
+                <div style="position: relative; flex: 1; min-width: 280px;">
+                    <input type="text" id="live-search-input" class="form-control" placeholder="🔍 Instant search notices by title, exam, dates, keywords..." style="padding-left: 1rem;">
+                </div>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <a th:href="@{/announcements}" class="btn btn-sm btn-outline">Full Notice Board &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Category Chips -->
+            <div class="filter-bar" style="margin-bottom: 0;">
+                <a th:href="@{/announcements}" class="filter-chip active">All Categories</a>
+                <a th:each="c : ${categories}" th:href="@{'/announcements?category=' + ${c.name()}}" class="filter-chip" th:text="${c.icon + ' ' + c.label}">Category</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements Section -->
+    <div style="margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2>Relevant Circulars &amp; Notices</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" th:text="${announcements.size() + ' notices visible'}">10 notices visible</span>
+        </div>
+
+        <div id="no-search-results" style="display: none; padding: 3rem; text-align: center; color: var(--text-muted);">
+            <h3>No matching circulars found</h3>
+            <p>Try searching for different keywords or clear the filter.</p>
+        </div>
+
+        <div class="announcements-grid">
+            <div th:each="a : ${announcements}" class="announcement-card">
+                <div>
+                    <div class="card-top-meta">
+                        <span class="badge" th:classappend="${a.category.cssClass}" th:text="${a.category.icon + ' ' + a.category.label}">Academic</span>
+                        <span th:classappend="${a.priority.cssClass}" style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase;" th:text="${a.priority.label}">High</span>
+                    </div>
+
+                    <h3 class="announcement-title">
+                        <a th:href="@{'/announcements/' + ${a.id}}" th:text="${a.title}">Title</a>
+                    </h3>
+
+                    <div class="target-pill">
+                        🎯 <span th:text="${a.targets != null && !a.targets.isEmpty() ? a.targets[0].computeReadableScope() : 'Campus-wide'}">Scope</span>
+                    </div>
+
+                    <p class="announcement-excerpt" th:text="${a.content}">Excerpt content</p>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <span th:if="${a.attachments != null && !a.attachments.isEmpty()}" style="font-size: 0.78rem; color: var(--primary-light); font-weight: 600;">
+                            📎 <span th:text="${a.attachments.size() + ' Attachment(s)'}">1 Attachment</span>
+                        </span>
+                        <span th:if="${a.attachments == null || a.attachments.isEmpty()}" style="font-size: 0.78rem; color: var(--text-muted);">
+                            Circular Notice
+                        </span>
+
+                        <a th:href="@{'/announcements/' + ${a.id}}" class="btn btn-sm btn-primary" style="padding: 0.3rem 0.75rem;">
+                            Read &amp; Acknowledge &rarr;
+                        </a>
+                    </div>
+
+                    <div class="card-author-footer">
+                        <div class="author-info">
+                            <span>✍️ <strong th:text="${a.author.fullName}">Author</strong></span>
+                        </div>
+                        <time th:text="${#temporals.format(a.publishedAt, 'dd MMM yyyy, HH:mm')}">Date</time>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authored Notices Section (Faculty & Admin) -->
+    <div sec:authorize="hasAnyRole('FACULTY', 'ADMIN')" th:if="${authoredAnnouncements != null && !authoredAnnouncements.isEmpty()}" style="margin-top: 3.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div>
+                <h2>Notices Published by You</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Manage, track reach &amp; monitor student acknowledgement rate</p>
+            </div>
+            <a th:href="@{/announcements/create}" class="btn btn-sm btn-outline">+ New Notice</a>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Notice Title</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Target Scope</th>
+                            <th>Published On</th>
+                            <th>Views</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="authNotice : ${authoredAnnouncements}">
+                            <td>
+                                <strong th:text="${authNotice.title}">Notice Title</strong>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${authNotice.category.cssClass}" th:text="${authNotice.category.label}">Academic</span>
+                            </td>
+                            <td>
+                                <span th:classappend="${authNotice.priority.cssClass}" th:text="${authNotice.priority.label}">Medium</span>
+                            </td>
+                            <td style="font-size: 0.8rem; color: var(--text-secondary);" th:text="${authNotice.targets != null && !authNotice.targets.isEmpty() ? authNotice.targets[0].computeReadableScope() : 'Campus-wide'}">
+                                All College
+                            </td>
+                            <td th:text="${#temporals.format(authNotice.publishedAt, 'dd MMM yyyy')}">Date</td>
+                            <td>
+                                <span style="font-family: 'JetBrains Mono', monospace;" th:text="${authNotice.viewCount}">24</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 0.4rem;">
+                                    <a th:href="@{'/announcements/' + ${authNotice.id}}" class="btn btn-sm btn-secondary" title="View">👁️</a>
+                                    <a th:href="@{'/admin/announcements/' + ${authNotice.id} + '/reach'}" class="btn btn-sm btn-accent" title="Reach Report">📊 Reach</a>
+                                    <a th:href="@{'/announcements/' + ${authNotice.id} + '/edit'}" class="btn btn-sm btn-outline" title="Edit">✏️</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
